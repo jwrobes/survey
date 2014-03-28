@@ -32,10 +32,12 @@ class SurveyController
     when "1"
       SurveyView.list_user_surveys(user.surveys)
     when "q"
-      puts "Invalid Entry"
-      SurveyView.options # this will not actually work
+      nil
     else
-      puts 'End of Program' #How to exit program
+      SurveyView.decoration
+      puts 'Invalid Entry..choose 1,2 or q!'
+      SurveyView.decoration
+      self.execute_menu_options(self.check_user_get_option)
     end
   end
 
