@@ -7,35 +7,48 @@ require_relative 'config/application'
 
 class SurveyController
 
-  # def initialize
-  #   survey = SurveyModel.new
-  # end
-
-
   def self.run!
     @username = SurveyView.welcome_and_get_user
-    SurveyView.check_user
-    SurveyView.menu
+     # 1 2 blank or a q
+    # get command
+    self.execute_menu_options(self.check_user_get_option)
+
+    #SurveyView.menu
+
     #@survey_results[:user_id] = User.find_by_name(@username).id
     # Survey.create(@survey_results)
   end
 
-  # def menu
-  #  case @choice
-  #  when "1"
-  #    list_user_surveys
-  #  when "2"
-  #    new_survey
-  #  else
-  #    puts "Invalid entry"
-  #    options
-  #    menu
-  #  end
-  # end
 
-  def save_survey_results
+    def self.check_user_get_option
+     @user = User.find_by_name(@username)
+      if @user
+         SurveyView.options
+      else
+         SurveyView.no_user #returns blank or q
+      end
+    end
 
-  end
+
+  def self.execute_menu_options(option)
+     case option
+     when "2"
+      survey_data = SurveyView.new_survey
+      self.fill_out_survey(survey_data)
+     when "1"
+      @user
+       SurveyView.list_user_surveys
+     when "q"
+       puts "Invalid Entry"
+       SurveyView.options # this will not actually work
+     end
+    end
+     else      puts 'End of Program' #How to exit program
+
+    def self.fill_out_survey(survey_data)
+      survey_data[:user_id] = User.find_by_name(@username).id
+      Survey.create(survey_data)
+    end
 
 end
 
@@ -62,33 +75,8 @@ class SurveyView
        @username = gets.chomp
     end
 
-    def check_user
-     @user = User.find_by_name(@username)
-       if @user
-         options
-       else
-         no_user
-         if @option != "q"
-           run!
-         end
-       end
-     end
-
-    def menu
-     case @choice
-     when "2"
-       new_survey
-     when "1"
-       list_user_surveys
-     else
-       puts "Invalid entry"
-       options
-       menu
-     end
-    end
-
     def list_user_surveys
-        user_surveys = @user.surveys
+        user_surveys = @ususerer.surveys
         user_surveys.each do |survey|
           puts "Survey ID: #{survey.id}"
           puts "Confidence: #{survey.confidence}"
@@ -103,12 +91,16 @@ class SurveyView
       puts "confidence level from 1-5"
       confidence = gets.chomp
       result = {:aha => aha, :confidence => confidence.to_i}
-      result[:user_id] = User.find_by_name(@username).id
-      Survey.create(result)
+
+      # result[:user_id] = User.find_by_name(@username).id
+      # Survey.create(result)
     end
 
     def options
-     puts "Choose an option. Enter 1 to see past survey results or 2 to take a new survey"
+     puts "1. See past survey results"
+     puts "2. Take a survey"
+     puts "q to Exit"
+     print "Choose an option: "
      @choice = gets.chomp
     end
 
