@@ -7,35 +7,47 @@ require_relative 'config/application'
 
 class SurveyController
 
-  # def initialize
-  #   survey = SurveyModel.new
-  # end
-
-
   def self.run!
-    @username = SurveyView.welcome_and_get_user
-    SurveyView.check_user
-    SurveyView.menu
-    #@survey_results[:user_id] = User.find_by_name(@username).id
-    # Survey.create(@survey_results)
+    @name = SurveyView.welcome_and_get_user
+    self.execute_menu_options(self.check_user_get_option)
   end
 
-  # def menu
-  #  case @choice
-  #  when "1"
-  #    list_user_surveys
-  #  when "2"
-  #    new_survey
-  #  else
-  #    puts "Invalid entry"
-  #    options
-  #    menu
-  #  end
-  # end
 
-  def save_survey_results
+    def self.check_user_get_option
+     @user = User.find_by_name(@name)
+      if @user
+         SurveyView.options
+      else
+         SurveyView.no_user #returns blank or q
+      end
+    end
 
+
+  def self.execute_menu_options(option)
+    user = User.find_by_name(@name)
+    case option
+    when "2"
+     survey_data = SurveyView.new_survey
+     self.fill_out_survey(survey_data)
+    when "1"
+      SurveyView.list_user_surveys(user.surveys)
+    when "q"
+      nil
+    else
+      SurveyView.decoration
+      puts 'Invalid Entry..choose 1,2 or q!'
+      SurveyView.decoration
+      self.execute_menu_options(self.check_user_get_option)
+    end
   end
+
+
+
+
+    def self.fill_out_survey(survey_data)
+      survey_data[:user_id] = User.find_by_name(@name).id
+      Survey.create(survey_data)
+    end
 
 end
 
@@ -59,42 +71,18 @@ class SurveyView
 
     def prompt_for_username
        print "Enter Username: "
-       @username = gets.chomp
+       @name = gets.chomp
     end
 
-    def check_user
-     @user = User.find_by_name(@username)
-       if @user
-         options
-       else
-         no_user
-         if @option != "q"
-           run!
-         end
-       end
-     end
-
-    def menu
-     case @choice
-     when "2"
-       new_survey
-     when "1"
-       list_user_surveys
-     else
-       puts "Invalid entry"
-       options
-       menu
-     end
-    end
-
-    def list_user_surveys
-        user_surveys = @user.surveys
+    def list_user_surveys(user_surveys)
+        decoration
         user_surveys.each do |survey|
-          puts "Survey ID: #{survey.id}"
+                   puts "Survey ID: #{survey.id}"
           puts "Confidence: #{survey.confidence}"
           puts "Aha: #{survey.aha}"
           decoration
         end
+
     end
 
     def new_survey
@@ -103,12 +91,16 @@ class SurveyView
       puts "confidence level from 1-5"
       confidence = gets.chomp
       result = {:aha => aha, :confidence => confidence.to_i}
-      result[:user_id] = User.find_by_name(@username).id
-      Survey.create(result)
+
+      # result[:user_id] = User.find_by_name(@name).id
+      # Survey.create(result)
     end
 
     def options
-     puts "Choose an option. Enter 1 to see past survey results or 2 to take a new survey"
+     puts "1. See past survey results"
+     puts "2. Take a survey"
+     puts "q to Exit"
+     print "Choose an option: "
      @choice = gets.chomp
     end
 
