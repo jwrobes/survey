@@ -8,20 +8,13 @@ require_relative 'config/application'
 class SurveyController
 
   def self.run!
-    @username = SurveyView.welcome_and_get_user
-     # 1 2 blank or a q
-    # get command
+    @name = SurveyView.welcome_and_get_user
     self.execute_menu_options(self.check_user_get_option)
-
-    #SurveyView.menu
-
-    #@survey_results[:user_id] = User.find_by_name(@username).id
-    # Survey.create(@survey_results)
   end
 
 
     def self.check_user_get_option
-     @user = User.find_by_name(@username)
+     @user = User.find_by_name(@name)
       if @user
          SurveyView.options
       else
@@ -31,22 +24,26 @@ class SurveyController
 
 
   def self.execute_menu_options(option)
-     case option
-     when "2"
-      survey_data = SurveyView.new_survey
-      self.fill_out_survey(survey_data)
-     when "1"
-      @user
-       SurveyView.list_user_surveys
-     when "q"
-       puts "Invalid Entry"
-       SurveyView.options # this will not actually work
-     end
+    user = User.find_by_name(@name)
+    case option
+    when "2"
+     survey_data = SurveyView.new_survey
+     self.fill_out_survey(survey_data)
+    when "1"
+      SurveyView.list_user_surveys(user.surveys)
+    when "q"
+      puts "Invalid Entry"
+      SurveyView.options # this will not actually work
+    else
+      puts 'End of Program' #How to exit program
     end
-     else      puts 'End of Program' #How to exit program
+  end
+
+
+
 
     def self.fill_out_survey(survey_data)
-      survey_data[:user_id] = User.find_by_name(@username).id
+      survey_data[:user_id] = User.find_by_name(@name).id
       Survey.create(survey_data)
     end
 
@@ -72,17 +69,18 @@ class SurveyView
 
     def prompt_for_username
        print "Enter Username: "
-       @username = gets.chomp
+       @name = gets.chomp
     end
 
-    def list_user_surveys
-        user_surveys = @ususerer.surveys
+    def list_user_surveys(user_surveys)
+        decoration
         user_surveys.each do |survey|
-          puts "Survey ID: #{survey.id}"
+                   puts "Survey ID: #{survey.id}"
           puts "Confidence: #{survey.confidence}"
           puts "Aha: #{survey.aha}"
           decoration
         end
+
     end
 
     def new_survey
@@ -92,7 +90,7 @@ class SurveyView
       confidence = gets.chomp
       result = {:aha => aha, :confidence => confidence.to_i}
 
-      # result[:user_id] = User.find_by_name(@username).id
+      # result[:user_id] = User.find_by_name(@name).id
       # Survey.create(result)
     end
 
