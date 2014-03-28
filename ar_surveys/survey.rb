@@ -1,33 +1,40 @@
 require_relative 'config/application'
 
-puts "Put your application code in #{File.expand_path(__FILE__)}"
+# puts "Put your application code in #{File.expand_path(__FILE__)}"
 
-
-#MODEL
-class SurveyModel
-
-def check_username(username)
-  if object.username == username
-
-  end
-
-  def take_new_survey
-
-end
 
 #CONTROLLER
 
 class SurveyController
 
-  def initialize
-    survey = SurveyModel.new
-  end
+  # def initialize
+  #   survey = SurveyModel.new
+  # end
 
 
   def self.run!
     @username = SurveyView.welcome_and_get_user
     SurveyView.check_user
     SurveyView.menu
+    #@survey_results[:user_id] = User.find_by_name(@username).id
+    # Survey.create(@survey_results)
+  end
+
+  # def menu
+  #  case @choice
+  #  when "1"
+  #    list_user_surveys
+  #  when "2"
+  #    new_survey
+  #  else
+  #    puts "Invalid entry"
+  #    options
+  #    menu
+  #  end
+  # end
+
+  def save_survey_results
+
   end
 
 end
@@ -36,15 +43,14 @@ class SurveyView
 
   class << self
 
-
     def welcome_and_get_user
-      welcome
-      decoration
-      prompt_for_username
+      self.welcome
+      self.decoration
+      self.prompt_for_username
     end
 
     def decoration
-       "*" * 25
+       puts "*"*75
     end
 
     def welcome
@@ -68,12 +74,12 @@ class SurveyView
        end
      end
 
-    def menu(choice)
+    def menu
      case @choice
-     when 1
-       p "show_past_results"
-     when 2
+     when "2"
        new_survey
+     when "1"
+       list_user_surveys
      else
        puts "Invalid entry"
        options
@@ -81,12 +87,24 @@ class SurveyView
      end
     end
 
+    def list_user_surveys
+        user_surveys = @user.surveys
+        user_surveys.each do |survey|
+          puts "Survey ID: #{survey.id}"
+          puts "Confidence: #{survey.confidence}"
+          puts "Aha: #{survey.aha}"
+          decoration
+        end
+    end
+
     def new_survey
       puts "Aha moment:"
       aha = gets.chomp
       puts "confidence level from 1-5"
       confidence = gets.chomp
-      results =
+      result = {:aha => aha, :confidence => confidence.to_i}
+      result[:user_id] = User.find_by_name(@username).id
+      Survey.create(result)
     end
 
     def options
@@ -101,7 +119,7 @@ class SurveyView
   end
 end
 
-
+SurveyController.run!
 
 
 
