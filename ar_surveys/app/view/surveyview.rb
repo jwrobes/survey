@@ -6,8 +6,6 @@ class SurveyView
 
     def welcome_and_start
       self.welcome
-      puts ""
-      puts ""
       self.decoration
       self.prompt_for_choice
     end
@@ -26,7 +24,6 @@ class SurveyView
       puts "   1. Login to Account"
       puts "   2. Create new Account"
       puts "   3. Quit the App"
-      #your name if you have a User Account or type 'new' to create a new account"
       gets.chomp
     end
 
@@ -43,22 +40,13 @@ class SurveyView
     end
 
     def invalid_user(user_name)
+      decoration
+      decoration
       puts "#{user_name} is not a valid user."
-      self.prompt_for_choice
+      decoration
+      puts "Please Start again"
+      decoration
     end
-
-    # def prompt_for_username
-    #   puts ""
-    #   puts "You have two options:"
-    #   puts "   1. Login to Account"
-    #   puts "   2. Create new Account"
-    #   #your name if you have a User Account or type 'new' to create a new account"
-    #   @name = gets.chomp
-    #   if @name = "new"
-    #     self.new_user
-    #   end
-    #   @name
-    # end
 
     def get_new_user
       puts "Enter New Username:"
@@ -87,9 +75,10 @@ class SurveyView
       result = {:aha => aha, :confidence => confidence.to_i}
     end
 
-    def options
-     puts "\e[H\e[2J"
-     puts ""
+    def display_options(user)
+     #puts "\e[H\e[2J"
+     decoration
+     puts "Weclome #{user}!"
      puts "1. See past AHA moments"
      puts "2. Save your AHA moment"
      puts "q to Exit"
