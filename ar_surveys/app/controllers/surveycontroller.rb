@@ -23,8 +23,8 @@ class SurveyController
   end 
 
   def self.create_new_user
-    new_user = View.get_new_user
-    User.create(new_user)
+    new_user = SurveyView.get_new_user
+    User.create(:name => new_user)
     User.find_by_name(new_user)
   end
 
